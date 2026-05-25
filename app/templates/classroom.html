@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Classroom Attendance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+    <h1>Classroom Attendance</h1>
+
+    <div class="front-banner">
+        Front of the Class
+    </div>
+
+    <div
+        class="classroom-grid"
+        style="grid-template-columns: repeat({{ cols }}, 1fr);"
+    >
+        {% for row in range(rows) %}
+            {% for col in range(cols) %}
+                <div class="table-card">
+                    <div class="seat-container">
+                        {% for seat in range(1, 4) %}
+                            <button
+                                class="seat-btn"
+                                onclick="openModal(this)"
+                                data-table="{{ row + 1 }}-{{ col + 1 }}"
+                                data-seat="{{ seat }}"
+                            >
+                                <span class="seat-icon">●</span>
+                            </button>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <div id="attendanceModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Check Attendance</h2>
+            <p id="seatInfo"></p>
+
+            <label>Student Name</label>
+            <input type="text" id="studentName">
+
+            <label>Student ID</label>
+            <input type="text" id="studentId">
+
+            <div class="modal-actions">
+                <button onclick="saveAttendance()">Save</button>
+                <button onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedButton = null;
+
+        function openModal(button) {
+            selectedButton = button;
+
+            const table = button.dataset.table;
+            const seat = button.dataset.seat;
+
+            document.getElementById("seatInfo").innerText =
+                `Table ${table} — Seat ${seat}`;
+
+            document.getElementById("studentName").value = "";
+            document.getElementById("studentId").value = "";
+
+            document.getElementById("attendanceModal").classList.remove("hidden");
+        }
+
+        function closeModal() {
+            document.getElementById("attendanceModal").classList.add("hidden");
+        }
+
+        function saveAttendance() {
+            const name = document.getElementById("studentName").value.trim();
+            const id = document.getElementById("studentId").value.trim();
+
+            if (!name || !id) {
+                alert("Please enter both name and ID.");
+                return;
+            }
+
+            selectedButton.innerText = `${name} (${id})`;
+            selectedButton.classList.add("checked-in");
+            closeModal();
+        }
+    </script>
+
+</body>
+</html>

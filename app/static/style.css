@@ -1,0 +1,183 @@
+body {
+    font-family: Inter, Arial, sans-serif;
+    background: #fafafa;
+    margin: 0;
+    padding: 48px;
+    color: #111;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 36px;
+    font-size: 26px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+}
+
+/* Top banner */
+.front-banner {
+    max-width: 1000px;
+    margin: 0 auto 28px auto;
+    padding: 10px 14px;
+    text-align: center;
+    font-size: 13px;
+    color: #6b7280;
+    background: transparent;
+    border: 1px solid #eaeaea;
+    border-radius: 14px;
+}
+
+/* Grid layout */
+.classroom-grid {
+    display: grid;
+    gap: 18px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Table cards */
+.table-card {
+    background: #ffffff;
+    border: 1px solid #ededed;
+    border-radius: 18px;
+    padding: 14px;
+    transition: 0.15s ease;
+}
+
+.table-card:hover {
+    border-color: #d4d4d4;
+}
+
+/* Seat layout */
+.seat-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+}
+/* Seat button (minimal square style) */
+.seat-btn {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border: 1px solid #e5e5e5;
+    border-radius: 14px;
+    background: #fff;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    transition: 0.15s ease;
+}
+
+.seat-btn:hover {
+    border-color: #c7c7c7;
+    background: #fafafa;
+}
+
+/* Seat icon */
+.seat-icon {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+/* Checked-in state */
+.checked-in {
+    background: #111;
+    border-color: #111;
+    color: #fff;
+}
+
+.checked-in .seat-icon {
+    color: #fff;
+}
+
+/* Modal overlay */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.2);
+    backdrop-filter: blur(3px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Hidden helper */
+.hidden {
+    display: none;
+}
+
+/* Modal box */
+.modal-content {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 18px;
+    width: 320px;
+    border: 1px solid #eaeaea;
+}
+
+/* Modal title */
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+/* Modal text */
+.modal-content p {
+    color: #6b7280;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+
+/* Labels */
+.modal-content label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+/* Inputs */
+.modal-content input {
+    width: 100%;
+    padding: 11px;
+    margin-bottom: 14px;
+    border-radius: 12px;
+    border: 1px solid #e5e5e5;
+    background: #fff;
+    box-sizing: border-box;
+    outline: none;
+    font-size: 13px;
+    transition: 0.15s ease;
+}
+
+.modal-content input:focus {
+    border-color: #111;
+}
+
+/* Modal buttons */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.modal-actions button {
+    flex: 1;
+    border: none;
+    padding: 11px;
+    border-radius: 12px;
+    cursor: pointer;
+    background: #111;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.modal-actions button:last-child {
+    background: #f3f4f6;
+    color: #111;
+}
