@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dashboard.css') }}">
+</head>
+<body>
+
+<div class="dashboard-container">
+    
+    <header class="dashboard-header">
+        <div>
+            <h1>Attendance Control Hub</h1>
+        </div>
+    </header>
+
+    <section class="metrics-grid">
+        <div class="metric-card">
+            <h3>Active Sessions</h3>
+            <div class="value">{{ active_count }}</div>
+        </div>
+        <div class="metric-card">
+            <h3>Total Classrooms</h3>
+            <div class="value">{{ total_sessions }}</div>
+        </div>
+        <div class="metric-card">
+            <h3>Total Checked In</h3>
+            <div class="value">{{ total_checked_in }}</div>
+        </div>
+    </section>
+
+    <section id="create-session" class="dashboard-section">
+        <h2>Launch a Seating Session Matrix</h2>
+        <form action="{{ url_for('create_session') }}" method="POST" class="inline-form">
+            <div class="form-field">
+                <label for="rows">Grid Rows</label>
+                <input type="number" id="rows" name="rows" value="6" min="1" max="20" required>
+            </div>
+            <div class="form-field">
+                <label for="cols">Grid Columns (Desks form in groups of 3)</label>
+                <input type="number" id="cols" name="cols" value="9" min="1" max="30" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Create New Session</button>
+        </form>
+    </section>
+
+    <section class="dashboard-section">
+        <h2>All Active and Past Tracking Sessions</h2>
+        <div class="responsive-table-wrapper">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Session ID</th>
+                        <th>Created Timestamp (UTC)</th>
+                        <th>Grid Size Dimensions</th>
+                        <th>Status Badge</th>
+                        <th>Management Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in sessions %}
+                    <tr>
+                        <td><strong>#{{ session.session_id }}</strong></td>
+                        <td>{{ session.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>{{ session.rows }} Rows × {{ session.cols }} Columns</td>
+                        <td>
+                            {% if session.is_active %}
+                                <span class="badge badge-active">Live</span>
+                            {% else %}
+                                <span class="badge badge-inactive">Archived</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 8px; flex-direction: column;">
+                                <a href="{{ url_for('classroom', session_id=session.session_id) }}" class="btn btn-secondary btn-sm">Student View</a>
+                                <a href="{{ url_for('teacher_view', session_id=session.session_id) }}" class="btn btn-primary btn-sm">Teacher Live View</a>
+                                <form action="{{ url_for('toggle_session', session_id=session.session_id) }}" method="POST">
+                                    <button type="submit" class="btn {% if session.is_active %}btn-outline-danger{% else %}btn-secondary{% endif %} btn-sm">
+                                        {% if session.is_active %}Close Intake{% else %}Reopen{% endif %}
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                            No classroom sessions found. Configure options above to get started.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>

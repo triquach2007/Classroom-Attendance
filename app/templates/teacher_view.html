@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='classroom.css') }}">
+    <style>.seat-btn { cursor: default !important; pointer-events: none !important; }</style>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center; margin-bottom: 20px;">
+            <h3>Join Code for Session #{{ session_id }}</h3>
+            <img src="{{ url_for('generate_qr', session_id=session_id) }}" style="max-width: 150px; border: 1px solid #ccc;">
+        </div>
+        <div class="grid-scroll-wrapper">
+            <table class="seating-table">
+                {% for r in range(1, rows + 1) %}
+                <tr><td>
+                    {% for c_start in range(1, cols + 1, 3) %}
+                    <div class="desk-group">
+                        {% for c in range(c_start, c_start + 3) %}
+                        {% if c <= cols %}
+                        <div class="seat-btn {% if (r, c) in seating_map %}occupied{% endif %}">
+                            {% if (r, c) in seating_map %}{{ seating_map[(r, c)].student_name }}<br><small>{{ seating_map[(r, c)].student_id }}</small>{% else %}Seat {{r}}-{{c}}{% endif %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</body>
+</html>

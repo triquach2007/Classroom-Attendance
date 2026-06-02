@@ -1,0 +1,231 @@
+/* Minimalist Color Palette & Variables */
+:root {
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-primary: #212529;
+    --text-muted: #6c757d;
+    --border-color: #e9ecef;
+    --primary-color: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --occupied-bg: #e2f0cb;
+    --occupied-text: #385e00;
+    --front-indicator: #e2e3e5;
+    --radius: 8px;
+    --transition: all 0.2s ease-in-out;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.5;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 900px;
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+.session-info {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+/* Front of the Class Indicator */
+.front-of-class {
+    background-color: var(--front-indicator);
+    color: var(--text-muted);
+    text-align: center;
+    padding: 10px;
+    font-weight: 500;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-radius: var(--radius);
+    margin-bottom: 20px;
+    border: 1px dashed #ced4da;
+}
+
+/* Scroll Container for Mobile Support */
+.grid-scroll-wrapper {
+    width: 100%;
+    overflow-x: auto; /* Enables scroll if content is too wide */
+    padding-bottom: 15px;
+    white-space: nowrap; /* Prevents rows from wrapping unexpectedly */
+}
+
+/* Structural Seating Rows Arrangement */
+.seating-table {
+    width: auto; /* Allows table to fit content without forcing expansion */
+    min-width: 100%; /* Ensures it fills available space */
+    border-collapse: collapse; /* Cleaner spacing management */
+}
+.seating-table td {
+    padding: 0;
+    text-align: center;
+}
+
+/* Container for grouping 3 slots into a physical table object */
+.desk-group {
+    display: inline-flex;
+    background-color: #f1f3f5;
+    border: 2px solid #ced4da;
+    border-radius: var(--radius);
+    padding: 8px;
+    gap: 8px;
+    margin: 0 4px; /* Reduced margin to save horizontal space */
+    vertical-align: top;
+}
+
+/* Touch-friendly Minimal Seating Buttons */
+.seat-btn {
+    min-width: 100px;
+    max-width: 140px;
+    min-height: 54px;
+    padding: 8px;
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    word-break: break-word;
+}
+
+.seat-btn:hover {
+    background-color: #e9ecef;
+    border-color: #ced4da;
+}
+
+/* Occupied Modifiers */
+.seat-btn.occupied {
+    background-color: var(--occupied-bg);
+    color: var(--occupied-text);
+    border-color: #c3e6cb;
+    font-weight: 600;
+}
+
+/* Native Dialog Modals Minimalist Styling */
+dialog {
+    border: none;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 400px;
+    width: calc(100% - 32px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    margin: auto;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+}
+
+dialog h3 {
+    font-size: 1.2rem;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+dialog p {
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    color: #495057;
+}
+
+/* Form layouts */
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    border: 1px solid #ced4da;
+    border-radius: var(--radius);
+    outline: none;
+    transition: var(--transition);
+}
+
+.form-group input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+.dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+button.btn {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: var(--radius);
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: var(--transition);
+}
+
+button.btn-secondary {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+button.btn-secondary:hover {
+    background-color: #dee2e6;
+}
+
+button.btn-primary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+button.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+button.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

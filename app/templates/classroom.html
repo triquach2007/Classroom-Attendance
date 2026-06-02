@@ -1,97 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Classroom Attendance</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Seat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='classroom.css') }}">
 </head>
 <body>
 
-    <h1>Classroom Attendance</h1>
+<div class="container">
+    <h1>Select Your Seat to Check In</h1>
+    <div class="session-info">Dimensions: {{ rows }} Rows × {{ cols }} Columns</div>
 
-    <div class="front-banner">
-        Front of the Class
+    <div class="front-of-class">
+        ▲ Front of the Class / Board Direction ▲
     </div>
 
-    <div
-        class="classroom-grid"
-        style="grid-template-columns: repeat({{ cols }}, 1fr);"
-    >
-        {% for row in range(rows) %}
-            {% for col in range(cols) %}
-                <div class="table-card">
-                    <div class="seat-container">
-                        {% for seat in range(1, 4) %}
-                            <button
-                                class="seat-btn"
-                                onclick="openModal(this)"
-                                data-table="{{ row + 1 }}-{{ col + 1 }}"
-                                data-seat="{{ seat }}"
-                            >
-                                <span class="seat-icon">●</span>
-                            </button>
-                        {% endfor %}
-                    </div>
-                </div>
+    <div class="grid-scroll-wrapper">
+        <table class="seating-table">
+            {% for r in range(1, rows + 1) %}
+            <tr>
+                <td>
+                    {% for c_start in range(1, cols + 1, 3) %}
+                        <div class="desk-group">
+                            {% for c in range(c_start, c_start + 3) %}
+                                {% if c <= cols %}
+                                    <button type="button" 
+                                            class="seat-btn {% if (r, c) in seating_map %}occupied{% endif %}"
+                                            data-row="{{ r }}" 
+                                            data-col="{{ c }}" 
+                                            onclick="handleSeatSelection(this)">
+                                        {% if (r, c) in seating_map %}
+                                            {% set student = seating_map[(r, c)] %}
+                                            {{ student.student_name }}<br><small>({{ student.student_id }})</small>
+                                        {% else %}
+                                            <span class="seat-label">Slot {{ r }}-{{ c }}</span>
+                                        {% endif %}
+                                    </button>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </td>
+            </tr>
             {% endfor %}
-        {% endfor %}
+        </table>
     </div>
+</div>
 
-    <div id="attendanceModal" class="modal hidden">
-        <div class="modal-content">
-            <h2>Check Attendance</h2>
-            <p id="seatInfo"></p>
-
-            <label>Student Name</label>
-            <input type="text" id="studentName">
-
-            <label>Student ID</label>
-            <input type="text" id="studentId">
-
-            <div class="modal-actions">
-                <button onclick="saveAttendance()">Save</button>
-                <button onclick="closeModal()">Cancel</button>
-            </div>
+<dialog id="studentDialog">
+    <form id="studentForm">
+        <h3>Seat Assignment <span id="targetBtn"></span></h3>
+        
+        <div class="form-group">
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" required autocomplete="off" placeholder="Jane Doe">
         </div>
+        
+        <div class="form-group">
+            <label for="studentId">Student ID:</label>
+            <input type="text" id="studentId" required autocomplete="off" placeholder="A1234567">
+        </div>
+        
+        <div class="dialog-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+            <button type="submit" id="submitBtn" class="btn btn-primary">Confirm Attendance</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="confirmDialog">
+    <h3>Confirm Your Seat</h3>
+    <p>Do you want to check into <strong id="confirmSeat"></strong> as <span id="confirmName"></span>?</p>
+    <div class="dialog-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+        <button type="button" id="executeConfirmBtn" class="btn btn-primary" onclick="processAutoCheckIn()">Yes, Check In</button>
     </div>
+</dialog>
 
-    <script>
-        let selectedButton = null;
+<script>
+    const dialog = document.getElementById('studentDialog');
+    const form = document.getElementById('studentForm');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    const confirmDialog = document.getElementById('confirmDialog');
+    const confirmSeatText = document.getElementById('confirmSeat');
+    const confirmNameText = document.getElementById('confirmName');
+    
+    const currentSessionId = parseInt("{{ session_id }}");
+    
+    let activeButton = null;
+    let cachedName = "";
+    let cachedId = "";
 
-        function openModal(button) {
-            selectedButton = button;
+    // EVICT CACHE ON LOAD: If visiting a fresh session, wipe local memory variables instantly
+    (function enforceFreshSessionCache() {
+        const cachedSessionId = localStorage.getItem('last_session_id');
+        if (cachedSessionId && parseInt(cachedSessionId) !== currentSessionId) {
+            localStorage.removeItem('student_name');
+            localStorage.removeItem('student_id');
+            localStorage.removeItem('last_session_id');
+        }
+    })();
 
-            const table = button.dataset.table;
-            const seat = button.dataset.seat;
+    function handleSeatSelection(buttonElement) {
+        activeButton = buttonElement;
+        
+        let row = activeButton.getAttribute('data-row');
+        let col = activeButton.getAttribute('data-col');
+        
+        cachedName = localStorage.getItem('student_name');
+        cachedId = localStorage.getItem('student_id');
 
-            document.getElementById("seatInfo").innerText =
-                `Table ${table} — Seat ${seat}`;
+        if (cachedName && cachedId) {
+            confirmSeatText.innerText = `Row ${row}, Column ${col}`;
+            confirmNameText.innerText = `${cachedName} (${cachedId})`;
+            confirmDialog.showModal();
+        } else {
+            document.getElementById('targetBtn').innerText = `(${row}, ${col})`;
+            dialog.showModal();
+        }
+    }
 
-            document.getElementById("studentName").value = "";
-            document.getElementById("studentId").value = "";
+    function closeModal() {
+        form.reset();
+        dialog.close();
+        activeButton = null;
+    }
 
-            document.getElementById("attendanceModal").classList.remove("hidden");
+    function closeConfirmModal() {
+        confirmDialog.close();
+        activeButton = null;
+        cachedName = "";
+        cachedId = "";
+    }
+
+    function processAutoCheckIn() {
+        confirmDialog.close();
+        sendAttendanceRequest(cachedName, cachedId);
+    }
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); 
+
+        let name = document.getElementById('studentName').value.trim();
+        let id = document.getElementById('studentId').value.trim();
+
+        if (!name || !id) {
+            alert("Please enter a valid Name and Student ID.");
+            return;
         }
 
-        function closeModal() {
-            document.getElementById("attendanceModal").classList.add("hidden");
-        }
+        localStorage.setItem('student_name', name);
+        localStorage.setItem('student_id', id);
+        localStorage.setItem('last_session_id', currentSessionId);
 
-        function saveAttendance() {
-            const name = document.getElementById("studentName").value.trim();
-            const id = document.getElementById("studentId").value.trim();
+        sendAttendanceRequest(name, id);
+    });
 
-            if (!name || !id) {
-                alert("Please enter both name and ID.");
-                return;
+    function sendAttendanceRequest(name, id) {
+        let row = activeButton.getAttribute('data-row');
+        let col = activeButton.getAttribute('data-col');
+        
+        submitBtn.disabled = true;
+
+        let payload = {
+            session_id: currentSessionId,
+            row: parseInt(row),
+            col: parseInt(col),
+            name: name,
+            id: id
+        };
+
+        fetch('/update_student', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // Remove visual indicators on components matching this student's ID inside this session layout view
+                const matchString = `(${id})`;
+                document.querySelectorAll('.seat-btn').forEach(btn => {
+                    if (btn.innerText.includes(matchString)) {
+                        let r = btn.getAttribute('data-row');
+                        let c = btn.getAttribute('data-col');
+                        btn.classList.remove('occupied');
+                        btn.innerHTML = `Seat ${r}-${c}`;
+                    }
+                });
+
+                // Set styles for the newly assigned location
+                activeButton.classList.add('occupied');
+                activeButton.innerHTML = `${name}<br><small>(${id})</small>`;
+                
+                if (dialog.open) {
+                    closeModal();
+                }
+            } else {
+                alert('Error: ' + data.message);
             }
-
-            selectedButton.innerText = `${name} (${id})`;
-            selectedButton.classList.add("checked-in");
-            closeModal();
-        }
-    </script>
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to save data.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            activeButton = null;
+            cachedName = "";
+            cachedId = "";
+        });
+    }
+</script>
 
 </body>
 </html>
